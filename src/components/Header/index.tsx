@@ -2,8 +2,8 @@
 import React, { useMemo } from 'react'
 import { Text } from 'rebass'
 import styled from 'styled-components'
-import Logo from '../../assets/svg/light.svg'
-import LogoDark from '../../assets/svg/white_logo.svg' 
+import Logo from '../../assets/svg/logo.svg'
+import LogoDark from '../../assets/svg/logo_white.svg' 
 import IconDay from '../../assets/images/icon/day.svg'
 import IconNight from '../../assets/images/icon/night.svg'
 
