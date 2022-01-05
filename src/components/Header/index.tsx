@@ -208,13 +208,14 @@ export default function Header() {
   return (
     <HeaderFrame>
       <HeaderRow>
-        <Title href="https://anyswap.exchange" target="__blank">
+        {/*<Title href="https://anyswap.exchange" target="__blank">*/}
+        <Title>
           <UniIcon>
             <img src={isDark ? LogoDark : Logo} alt="logo" />
           </UniIcon>
         </Title>
-        <VersionLinkBox href='https://v1.anyswap.exchange'>
-          V1↗
+        <VersionLinkBox href=''>
+          
         </VersionLinkBox>
       </HeaderRow>
       <HeaderControls>
