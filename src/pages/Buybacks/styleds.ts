@@ -46,7 +46,7 @@ export const MyBalanceBox = styled.div`
 width: 90%;
 border-radius: 0.5625rem;
 box-shadow: 0.4375rem 0.125rem 1.625rem 0 rgb(0 0 0 / 6%);
-background-color: #21263e;
+background-color: ${({ theme }) => theme.contentBg};
 padding: 1rem 2.5rem;
 margin-bottom: 20px;
 overflow: auto;
@@ -57,7 +57,7 @@ export const MyBalanceBox2 = styled.div`
 width: 90%;
 border-radius: 0.5625rem;
 box-shadow: 0.4375rem 0.125rem 1.625rem 0 rgb(0 0 0 / 6%);
-background-color: #21263e;
+background-color: ${({ theme }) => theme.contentBg};
 padding: 1rem 2.5rem;
 margin-bottom: 20px;
 overflow: auto;
@@ -68,7 +68,7 @@ export const MyBalanceBox3 = styled.div`
 width: 90%;
 border-radius: 0.5625rem;
 box-shadow: 0.4375rem 0.125rem 1.625rem 0 rgb(0 0 0 / 6%);
-background-color: #21263e;
+background-color: ${({ theme }) => theme.contentBg};
 padding: 1rem 2.5rem;
 margin-bottom: 20px;
 overflow: auto;
