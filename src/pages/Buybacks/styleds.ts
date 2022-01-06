@@ -1,8 +1,82 @@
 import styled from 'styled-components'
 import { NavLink } from 'react-router-dom'
 
+
+export const Container = styled.div`
+  display: flex; 
+  justify-content: flex-start;
+  flex-wrap: wrap;
+
+}
+`
+
+export const Row = styled.div`
+  display: inline-flex;
+  @media (min-width: 320px) and (max-width: 480px) {
+    display: block;
+  }
+  @media (min-width: 768px) and (max-width: 1024px) {
+    display: block;
+  }
+}
+`
+
+export const Col = styled.div`
+  width: 338px;
+  @media (min-width: 320px) and (max-width: 480px) {
+    width: 375px;
+  }
+  @media (min-width: 481px) and (max-width: 767px) {
+    width: 275px;
+  }
+  @media (min-width: 768px) and (max-width: 1024px) {
+    width: 800px;
+  }
+  @media only screen 
+  and (min-width: 1024px) 
+  and (max-height: 1366px) 
+  and (orientation: portrait) 
+  and (-webkit-min-device-pixel-ratio: 1.5) {
+   width: 620px;
+  }
+}
+`
+
 export const MyBalanceBox = styled.div`
-  width: 33.3%;
+width: 90%;
+border-radius: 0.5625rem;
+box-shadow: 0.4375rem 0.125rem 1.625rem 0 rgb(0 0 0 / 6%);
+background-color: #21263e;
+padding: 1rem 2.5rem;
+margin-bottom: 20px;
+overflow: auto;
+  }
+`
+
+export const MyBalanceBox2 = styled.div`
+width: 90%;
+border-radius: 0.5625rem;
+box-shadow: 0.4375rem 0.125rem 1.625rem 0 rgb(0 0 0 / 6%);
+background-color: #21263e;
+padding: 1rem 2.5rem;
+margin-bottom: 20px;
+overflow: auto;
+  }
+`
+
+export const MyBalanceBox3 = styled.div`
+width: 90%;
+border-radius: 0.5625rem;
+box-shadow: 0.4375rem 0.125rem 1.625rem 0 rgb(0 0 0 / 6%);
+background-color: #21263e;
+padding: 1rem 2.5rem;
+margin-bottom: 20px;
+overflow: auto;
+  }
+`
+
+export const BuybackLedger = styled.div`
+  width: 100%;
 
   border-radius: 0.5625rem;
   box-shadow: 0.4375rem 0.125rem 1.625rem 0 rgba(0, 0, 0, 0.06);
@@ -13,6 +87,11 @@ export const MyBalanceBox = styled.div`
   @media screen and (max-width: 960px) {
     padding: 1rem 1rem;
   }
+`
+
+export const CenteredText = styled.div`
+  font-size: 1.2rem;
+  text-align: center;
 `
 
 export const Flex = styled.div`

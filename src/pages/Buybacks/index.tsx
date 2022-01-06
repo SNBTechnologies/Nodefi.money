@@ -1,8 +1,7 @@
 
 // import React, { useEffect, useMemo, useState } from 'react'
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { Container, Row, Col } from 'react-bootstrap';
-import styled from 'styled-components'
+import React, { useCallback, useEffect, useState } from 'react'
+import styled from 'styled-components' 
 
 
 
@@ -16,12 +15,9 @@ import { useActiveWeb3React } from '../../hooks'
 import { useETHBalances } from '../../state/wallet/hooks'
 import { useBridgeTokenList } from '../../state/lists/hooks'
 
-import TokenLogo from '../../components/TokenLogo'
-import { useTokenComparator } from '../../components/SearchModal/sorting'
 import AppBody from '../AppBody'
 import Title from '../../components/Title'
 
-import SearchIcon from '../../assets/images/icon/search.svg'
 import { ReactComponent as Dropup } from '../../assets/images/dropup-blue.svg'
 import { ReactComponent as Dropdown } from '../../assets/images/dropdown-blue.svg'
 
@@ -34,19 +30,22 @@ import {formatDecimal} from '../../utils/tools/tools'
 import { isAddress } from '../../utils'
 
 import {
-  SearchBox,
-  SearchInput,
+  Container,
+  Row,
+  Col,
   MyBalanceBox,
+  MyBalanceBox2,
+  MyBalanceBox3,
   TitleAndSearchBox,
   MyBalanceTokenBox,
   DBThead,
   DBTh,
   DBTbody,
+  CenteredText,
+  BuybackLedger,
   DBTd,
   TokenTableCoinBox,
-  TokenTableLogo,
   TokenNameBox,
-  TokenActionBtnSwap,
   MoreBtnBox,
   DBTables,
 } from './styleds'
@@ -98,15 +97,13 @@ export default function Buybacks() {
 
   const allTokensList:any = useBridgeTokenList(ROUTER_BRIDGE_TYPE, chainId)
   // const allBalances = useBridgeAllTokensBalances(chainId)
-  const {balances: allBridgeBalances} = useTokenComparator('bridgeTokenList', chainId, false)
-  const {balances: allRouterBalances} = useTokenComparator('routerTokenList', chainId, false)
+  // const {balances: allBridgeBalances} = useTokenComparator('bridgeTokenList', chainId, false)
+ //  const {balances: allRouterBalances} = useTokenComparator('routerTokenList', chainId, false)
   // console.log(allTokensList)
   // console.log(allBalances['0x95bf7e307bc1ab0ba38ae10fc27084bc36fcd605']?.toSignificant(6))
 
   // const [poolArr, setPoolArr] = useState<Array<string>>()
 
-  const [allTokenArr, setAllTokenArr] = useState<Array<string>>()
-  const [allTokenList, setAllTokenList] = useState<any>()
   const [pagecount, setPagecount] = useState(0)
   const [totalCount, setTotalCount] = useState(0)
 
@@ -114,20 +111,6 @@ export default function Buybacks() {
 
   // const totalCount:number = allTokenList ? allTokenList.length : 0
 
-  const allBalances = useMemo(() => {
-    // const obj:any = {}
-    return {
-      ...allBridgeBalances,
-      ...allRouterBalances
-    }
-    // if (allBridgeBalances && allRouterBalances) {
-    //   return {
-    //     ...allBridgeBalances
-    //   }
-    // } else if () {
-
-    // }
-  }, [allBridgeBalances, allRouterBalances])
 
   const getAllTokens = useCallback(() => {
     const ulist:any = []
@@ -244,105 +227,20 @@ export default function Buybacks() {
       // console.log(alist)
       // console.log(tlist)
       setTotalCount(alist.length)
-      setAllTokenList(tlist)
       // setPoolArr(ulist)
-      setAllTokenArr(alist)
     })
   }, [chainId, allTokensList])
 
   useEffect(() => {
-    setAllTokenList([])
     // setPoolArr([])
-    setAllTokenArr([])
     getAllTokens()
   }, [chainId])
 
   const [searchContent, setSearchContent] = useState('')
   const [showMore, setShowMore] = useState(true)
 
-  const viewTokenList = useMemo(() => {
-    // console.log(pagecount)
-    const start = pagecount * pagesize
-    const end = start + pagesize
-    if (allTokenArr) {
-      const resArr = searchContent ? allTokenArr : allTokenArr.slice(start, end)
-      return resArr
-    }
-    return []
-  }, [pagecount, allTokenArr, searchContent, allTokenList])
-  
-  const tokenList = useMemo(() => {
-    const l:any = []
-    if (account) {
-      // console.log(viewTokenList)
-      for (const token of viewTokenList) {
-        const anyToken = allTokenList[token]?.underlying ? allTokenList[token]?.underlying?.address?.toLowerCase() : allTokenList[token]?.address?.toLowerCase()
-        const undToken = allTokenList[token]?.underlying ? allTokenList[token]?.address?.toLowerCase() : ''
-        let balance:any = allBalances && allBalances[anyToken] ? allBalances[anyToken]?.toSignificant(6) : ''
-        
-        let underlyingBlance:any = ''
-        let totalBlance:any = 0
-        if (undToken) {
-          balance = allBalances && allBalances[undToken] ? allBalances[undToken]?.toSignificant(6) : ''
-          underlyingBlance = allBalances && allBalances[anyToken] ? allBalances[anyToken]?.toSignificant(6) : ''
-        }
-        if (
-          ETHBalance
-          && config.getCurChainInfo(chainId)?.nativeToken
-          && token.toLowerCase() === config.getCurChainInfo(chainId).nativeToken.toLowerCase()
-        ) {
-          balance = ETHBalance ? formatDecimal(ETHBalance.toSignificant(6), 2) : '0'
-        }
-        if (balance && underlyingBlance) {
-          totalBlance = Number(balance) + Number(underlyingBlance)
-        } else if (balance) {
-          totalBlance = balance
-        } else if (underlyingBlance) {
-          totalBlance = underlyingBlance
-        } else {
-          totalBlance = ''
-        }
-        
-        l.push({
-          ...allTokenList[token],
-          balance: balance,
-          poolBlance: underlyingBlance,
-          totalBlance: totalBlance
-        })
-      }
-    } else {
-      for (const token of viewTokenList) {
-        l.push({
-          ...allTokenList[token]
-        })
-      }
-    }
-    l.sort((a:any, b:any) => {
-      if (!isNaN(a.totalBlance) && !isNaN(b.totalBlance) && Number(a.totalBlance) > Number(b.totalBlance)) {
-        return -1
-      }
-      return 0
-    })
-    return l
-  }, [viewTokenList, allTokenList, allBalances])
-  // console.log(tokenList)
-  function searchBox() {
-    return (
-      <>
-        <SearchBox>
-          <div className="icon">
-            <img src={SearchIcon} alt={''} />
-          </div>
-          <SearchInput
-            placeholder={t('searchToken')}
-            onChange={(e: any) => {
-              setSearchContent(e.target.value)
-            }}
-          ></SearchInput>
-        </SearchBox>
-      </>
-    )
-  }
+
+ 
 
   function changePage (callback:any, pCount:any) {
     
@@ -371,295 +269,159 @@ export default function Buybacks() {
         <Title title={t('Buybacks')}></Title>
         
         <Container>
-          <Row style={{display: 'inline-flex'}}>
+          <Row>
             <Col>
               <MyBalanceBox>
                 <TitleAndSearchBox>
-                  <h3>{t('myBalance')}</h3>
-                  {searchBox()}
+                  <h3>{t('Number of Buybacks')}</h3>
                 </TitleAndSearchBox>
-                <MyBalanceTokenBox className={showMore ? 'showMore' : ''}>
-                  <DBTables>
-                    <DBThead>
-                      <tr>
-                        <DBTh className="l">{t('Coins')}</DBTh>
-                        <DBTh className="r">{t('balances')}</DBTh>
-                        <DBTh className="r">{t('lr')}</DBTh>
-                        <DBTh className="r">{t('TotalBalance')}</DBTh>
-                        <DBTh className="c">{t('Action')}</DBTh>
-                      </tr>
-                    </DBThead>
-                    <DBTbody>
-                      {/* <tr>
-                        <DBTd>
-                          <TokenTableCoinBox>
-                            <TokenTableLogo>
-                              <TokenLogo
-                                symbol={config.getCurChainInfo(chainId).symbol}
-                                size={'1.625rem'}
-                              ></TokenLogo>
-                            </TokenTableLogo>
-                            <TokenNameBox>
-                              <h3>{config.getBaseCoin(config.getCurChainInfo(chainId)?.symbol, chainId)}</h3>
-                              <p>{config.getBaseCoin(config.getCurChainInfo(chainId)?.name, chainId, 1)}</p>
-                            </TokenNameBox>
-                          </TokenTableCoinBox>
-                        </DBTd>
-                        <DBTd className="r">{ETHBalance?.toSignificant(6) ? formatDecimal(ETHBalance?.toSignificant(6), 2) : '-'}</DBTd>
-                        <DBTd className="r">{ETHBalance ? '0.00' : '-'}</DBTd>
-                        <DBTd className="r">{ETHBalance?.toSignificant(6) ? formatDecimal(ETHBalance?.toSignificant(6), 2) : '-'}</DBTd>
-                        <DBTd className="c"></DBTd>
-                      </tr> */}
-                      {tokenList.length > 0 ? (
-                        tokenList.map((item:any, index:any) => {
-                          if (
-                            !searchContent
-                            || (item?.name && item?.name.toLowerCase().indexOf(searchContent.toLowerCase()) !== -1)
-                            || (item?.symbol && item?.symbol.toLowerCase().indexOf(searchContent.toLowerCase()) !== -1)
-                            || (item?.address && item?.address.toLowerCase().indexOf(searchContent.toLowerCase()) !== -1)
-                            || (item?.underlying?.address && item?.underlying?.address.toLowerCase().indexOf(searchContent.toLowerCase()) !== -1)
-                            || (item?.underlying?.symbol && item?.underlying?.symbol.toLowerCase().indexOf(searchContent.toLowerCase()) !== -1)
-                            || (item?.underlying?.name && item?.underlying?.name.toLowerCase().indexOf(searchContent.toLowerCase()) !== -1)
-                          ) {
-                            return (
-                              <tr key={index}>
-                                <DBTd>
-                                  <TokenTableCoinBox>
-                                    <TokenTableLogo>
-                                      <TokenLogo
-                                        symbol={config.getBaseCoin(item?.symbol, chainId)}
-                                        logoUrl={item.logoUrl}
-                                        size={'1.625rem'}
-                                      ></TokenLogo>
-                                    </TokenTableLogo>
-                                    <TokenNameBox>
-                                      <h3>{config.getBaseCoin(item?.symbol, chainId)}</h3>
-                                      <p>{config.getBaseCoin(item?.name, chainId, 1)}</p>
-                                    </TokenNameBox>
-                                  </TokenTableCoinBox>
-                                </DBTd>
-                                <DBTd className="r">{item.balance || item.balance === 0 ? formatDecimal(item.balance, 2) : '-'}</DBTd>
-                                <DBTd className="r">{item.poolBlance || item.poolBlance === 0 ? formatDecimal(item.poolBlance, 2) : '-'}</DBTd>
-                                <DBTd className="r">{item.totalBlance || item.totalBlance === 0 ? formatDecimal(item.totalBlance, 2) : '-'}</DBTd>
-                                <DBTd className="c">
-                                  {
-                                    item.isView ? (
-                                      <span style={{ display: 'inline-block' }}>
-                                        <TokenActionBtnSwap to={'/dashboard'} className="disabled">
-                                          {t('swap')}
-                                        </TokenActionBtnSwap>
-                                      </span>
-                                    ) : (
-                                      <span style={{ display: 'inline-block' }}>
-                                        {
-                                          item.type === 'router' ? (
-                                            <TokenActionBtnSwap to={config.getCurConfigInfo().isOpenBridge ? '/router?bridgetoken=' + item?.address : '/swap?bridgetoken=' + item?.address}>
-                                              {config.getCurConfigInfo().isOpenBridge ? t('router') : t('swap')}
-                                            </TokenActionBtnSwap>
-                                          ) : (
-                                            <TokenActionBtnSwap to={'/bridge?bridgetoken=' + item?.address + '&bridgetype=' + item.bridgeType}>
-                                              {t('bridge')}
-                                            </TokenActionBtnSwap>
-                                          )
-                                        }
-                                        {/* <TokenActionBtnSwap to={(item.type === 'router' ? '/swap?bridgetoken=' : '/bridge?bridgetoken=') + item?.address}>
-                                          {t('swap')}
-                                        </TokenActionBtnSwap> */}
-                                      </span>
-                                    )
-                                  }
-                                </DBTd>
-                              </tr>
-                            )
-                          } else {
-                            return (
-                              <tr key={index} style={{ display: 'none' }}>
-                                <DBTd className="c">-</DBTd>
-                                <DBTd className="c">-</DBTd>
-                                <DBTd className="c">-</DBTd>
-                                <DBTd className="c">-</DBTd>
-                                <DBTd className="c">-</DBTd>
-                              </tr>
-                            )
-                          }
-                        })
-                      ) : (
-                        <tr key={0}>
-                          <DBTd className="c">-</DBTd>
-                          <DBTd className="c">-</DBTd>
-                          <DBTd className="c">-</DBTd>
-                          <DBTd className="c">-</DBTd>
-                          <DBTd className="c">-</DBTd>
-                        </tr>
-                      )}
-                    </DBTbody>
-                  </DBTables>
-                  {showMore && totalCount > pagesize && !searchContent ? changePage(setPagecount, pagecount) : ''}
-                </MyBalanceTokenBox>
-                <MoreBtnBox
-                  onClick={() => {
-                    setShowMore(!showMore)
-                  }}
-                >
-                  {showMore ? (
-                    <>
-                      <ColoredDropup></ColoredDropup>
-                      {t('pichUp')}
-                    </>
-                  ) : (
-                    <>
-                      <ColoredDropdown></ColoredDropdown>
-                      {t('showMore')}
-                    </>
-                  )}
-                </MoreBtnBox>
+                <CenteredText>
+                  132
+                </CenteredText>
               </MyBalanceBox>
             </Col>
             <Col>
-              <MyBalanceBox>
+              <MyBalanceBox2>
                 <TitleAndSearchBox>
-                  <h3>{t('myBalance')}</h3>
-                  {searchBox()}
+                  <h3>{t('Total Amount (USD)')}</h3>
                 </TitleAndSearchBox>
-                <MyBalanceTokenBox className={showMore ? 'showMore' : ''}>
-                  <DBTables>
-                    <DBThead>
-                      <tr>
-                        <DBTh className="l">{t('Coins')}</DBTh>
-                        <DBTh className="r">{t('balances')}</DBTh>
-                        <DBTh className="r">{t('lr')}</DBTh>
-                        <DBTh className="r">{t('TotalBalance')}</DBTh>
-                        <DBTh className="c">{t('Action')}</DBTh>
-                      </tr>
-                    </DBThead>
-                    <DBTbody>
-                      {/* <tr>
-                        <DBTd>
-                          <TokenTableCoinBox>
-                            <TokenTableLogo>
-                              <TokenLogo
-                                symbol={config.getCurChainInfo(chainId).symbol}
-                                size={'1.625rem'}
-                              ></TokenLogo>
-                            </TokenTableLogo>
-                            <TokenNameBox>
-                              <h3>{config.getBaseCoin(config.getCurChainInfo(chainId)?.symbol, chainId)}</h3>
-                              <p>{config.getBaseCoin(config.getCurChainInfo(chainId)?.name, chainId, 1)}</p>
-                            </TokenNameBox>
-                          </TokenTableCoinBox>
-                        </DBTd>
-                        <DBTd className="r">{ETHBalance?.toSignificant(6) ? formatDecimal(ETHBalance?.toSignificant(6), 2) : '-'}</DBTd>
-                        <DBTd className="r">{ETHBalance ? '0.00' : '-'}</DBTd>
-                        <DBTd className="r">{ETHBalance?.toSignificant(6) ? formatDecimal(ETHBalance?.toSignificant(6), 2) : '-'}</DBTd>
-                        <DBTd className="c"></DBTd>
-                      </tr> */}
-                      {tokenList.length > 0 ? (
-                        tokenList.map((item:any, index:any) => {
-                          if (
-                            !searchContent
-                            || (item?.name && item?.name.toLowerCase().indexOf(searchContent.toLowerCase()) !== -1)
-                            || (item?.symbol && item?.symbol.toLowerCase().indexOf(searchContent.toLowerCase()) !== -1)
-                            || (item?.address && item?.address.toLowerCase().indexOf(searchContent.toLowerCase()) !== -1)
-                            || (item?.underlying?.address && item?.underlying?.address.toLowerCase().indexOf(searchContent.toLowerCase()) !== -1)
-                            || (item?.underlying?.symbol && item?.underlying?.symbol.toLowerCase().indexOf(searchContent.toLowerCase()) !== -1)
-                            || (item?.underlying?.name && item?.underlying?.name.toLowerCase().indexOf(searchContent.toLowerCase()) !== -1)
-                          ) {
-                            return (
-                              <tr key={index}>
-                                <DBTd>
-                                  <TokenTableCoinBox>
-                                    <TokenTableLogo>
-                                      <TokenLogo
-                                        symbol={config.getBaseCoin(item?.symbol, chainId)}
-                                        logoUrl={item.logoUrl}
-                                        size={'1.625rem'}
-                                      ></TokenLogo>
-                                    </TokenTableLogo>
-                                    <TokenNameBox>
-                                      <h3>{config.getBaseCoin(item?.symbol, chainId)}</h3>
-                                      <p>{config.getBaseCoin(item?.name, chainId, 1)}</p>
-                                    </TokenNameBox>
-                                  </TokenTableCoinBox>
-                                </DBTd>
-                                <DBTd className="r">{item.balance || item.balance === 0 ? formatDecimal(item.balance, 2) : '-'}</DBTd>
-                                <DBTd className="r">{item.poolBlance || item.poolBlance === 0 ? formatDecimal(item.poolBlance, 2) : '-'}</DBTd>
-                                <DBTd className="r">{item.totalBlance || item.totalBlance === 0 ? formatDecimal(item.totalBlance, 2) : '-'}</DBTd>
-                                <DBTd className="c">
-                                  {
-                                    item.isView ? (
-                                      <span style={{ display: 'inline-block' }}>
-                                        <TokenActionBtnSwap to={'/dashboard'} className="disabled">
-                                          {t('swap')}
-                                        </TokenActionBtnSwap>
-                                      </span>
-                                    ) : (
-                                      <span style={{ display: 'inline-block' }}>
-                                        {
-                                          item.type === 'router' ? (
-                                            <TokenActionBtnSwap to={config.getCurConfigInfo().isOpenBridge ? '/router?bridgetoken=' + item?.address : '/swap?bridgetoken=' + item?.address}>
-                                              {config.getCurConfigInfo().isOpenBridge ? t('router') : t('swap')}
-                                            </TokenActionBtnSwap>
-                                          ) : (
-                                            <TokenActionBtnSwap to={'/bridge?bridgetoken=' + item?.address + '&bridgetype=' + item.bridgeType}>
-                                              {t('bridge')}
-                                            </TokenActionBtnSwap>
-                                          )
-                                        }
-                                        {/* <TokenActionBtnSwap to={(item.type === 'router' ? '/swap?bridgetoken=' : '/bridge?bridgetoken=') + item?.address}>
-                                          {t('swap')}
-                                        </TokenActionBtnSwap> */}
-                                      </span>
-                                    )
-                                  }
-                                </DBTd>
-                              </tr>
-                            )
-                          } else {
-                            return (
-                              <tr key={index} style={{ display: 'none' }}>
-                                <DBTd className="c">-</DBTd>
-                                <DBTd className="c">-</DBTd>
-                                <DBTd className="c">-</DBTd>
-                                <DBTd className="c">-</DBTd>
-                                <DBTd className="c">-</DBTd>
-                              </tr>
-                            )
-                          }
-                        })
-                      ) : (
-                        <tr key={0}>
-                          <DBTd className="c">-</DBTd>
-                          <DBTd className="c">-</DBTd>
-                          <DBTd className="c">-</DBTd>
-                          <DBTd className="c">-</DBTd>
-                          <DBTd className="c">-</DBTd>
-                        </tr>
-                      )}
-                    </DBTbody>
-                  </DBTables>
-                  {showMore && totalCount > pagesize && !searchContent ? changePage(setPagecount, pagecount) : ''}
-                </MyBalanceTokenBox>
-                <MoreBtnBox
-                  onClick={() => {
-                    setShowMore(!showMore)
-                  }}
-                >
-                  {showMore ? (
-                    <>
-                      <ColoredDropup></ColoredDropup>
-                      {t('pichUp')}
-                    </>
-                  ) : (
-                    <>
-                      <ColoredDropdown></ColoredDropdown>
-                      {t('showMore')}
-                    </>
-                  )}
-                </MoreBtnBox>
-              </MyBalanceBox>
+                <CenteredText>
+                $1,227,967
+                </CenteredText>
+              </MyBalanceBox2>
             </Col>
-            <Col>3 of 3</Col>
+            <Col>
+              <MyBalanceBox3>
+                <TitleAndSearchBox>
+                  <h3>{t('Average Buyback (USD)')}</h3>
+                </TitleAndSearchBox>
+                <CenteredText>
+                $68,220
+                </CenteredText>
+              </MyBalanceBox3>
+            </Col>
           </Row>
+          <BuybackLedger>
+            <TitleAndSearchBox>
+              <h3>{t('Buyback Ledger')}</h3>
+            </TitleAndSearchBox>
+            <MyBalanceTokenBox className={showMore ? 'showMore' : ''}>
+              <DBTables>
+                <DBThead>
+                  <tr>
+                    <DBTh className="l">{t('AMOUNT (ETH)')}</DBTh>
+                    <DBTh className="r">{t('AMOUNT (USD)')}</DBTh>
+                    <DBTh className="r">{t('DATE')}</DBTh>
+                    <DBTh className="r">{t('TX HASH')}</DBTh>
+                  </tr>
+                </DBThead>
+                <DBTbody>
+                  <tr>
+                    <DBTd>
+                      <TokenTableCoinBox>
+
+                        <TokenNameBox>
+                          <h3>100.00</h3>
+                        </TokenNameBox>
+                      </TokenTableCoinBox>
+                    </DBTd>
+                    <DBTd className="r">{ETHBalance?.toSignificant(6) ? formatDecimal(ETHBalance?.toSignificant(6), 2) : '-'}</DBTd>
+                    <DBTd className="r">{ETHBalance ? '0.00' : '-'}</DBTd>
+                    <DBTd className="r">{ETHBalance?.toSignificant(6) ? formatDecimal(ETHBalance?.toSignificant(6), 2) : '-'}</DBTd>
+                    <DBTd className="c"></DBTd>
+                  </tr>
+                  <tr>
+                    <DBTd>
+                      <TokenTableCoinBox>
+
+                        <TokenNameBox>
+                          <h3>100.00</h3>
+                        </TokenNameBox>
+                      </TokenTableCoinBox>
+                    </DBTd>
+                    <DBTd className="r">{ETHBalance?.toSignificant(6) ? formatDecimal(ETHBalance?.toSignificant(6), 2) : '-'}</DBTd>
+                    <DBTd className="r">{ETHBalance ? '0.00' : '-'}</DBTd>
+                    <DBTd className="r">{ETHBalance?.toSignificant(6) ? formatDecimal(ETHBalance?.toSignificant(6), 2) : '-'}</DBTd>
+                    <DBTd className="c"></DBTd>
+                  </tr>
+                  <tr>
+                    <DBTd>
+                      <TokenTableCoinBox>
+
+                        <TokenNameBox>
+                          <h3>100.00</h3>
+                        </TokenNameBox>
+                      </TokenTableCoinBox>
+                    </DBTd>
+                    <DBTd className="r">{ETHBalance?.toSignificant(6) ? formatDecimal(ETHBalance?.toSignificant(6), 2) : '-'}</DBTd>
+                    <DBTd className="r">{ETHBalance ? '0.00' : '-'}</DBTd>
+                    <DBTd className="r">{ETHBalance?.toSignificant(6) ? formatDecimal(ETHBalance?.toSignificant(6), 2) : '-'}</DBTd>
+                    <DBTd className="c"></DBTd>
+                  </tr>
+                  <tr>
+                    <DBTd>
+                      <TokenTableCoinBox>
+
+                        <TokenNameBox>
+                          <h3>100.00</h3>
+                        </TokenNameBox>
+                      </TokenTableCoinBox>
+                    </DBTd>
+                    <DBTd className="r">{ETHBalance?.toSignificant(6) ? formatDecimal(ETHBalance?.toSignificant(6), 2) : '-'}</DBTd>
+                    <DBTd className="r">{ETHBalance ? '0.00' : '-'}</DBTd>
+                    <DBTd className="r">{ETHBalance?.toSignificant(6) ? formatDecimal(ETHBalance?.toSignificant(6), 2) : '-'}</DBTd>
+                    <DBTd className="c"></DBTd>
+                  </tr>
+                  <tr>
+                    <DBTd>
+                      <TokenTableCoinBox>
+
+                        <TokenNameBox>
+                          <h3>100.00</h3>
+                        </TokenNameBox>
+                      </TokenTableCoinBox>
+                    </DBTd>
+                    <DBTd className="r">{ETHBalance?.toSignificant(6) ? formatDecimal(ETHBalance?.toSignificant(6), 2) : '-'}</DBTd>
+                    <DBTd className="r">{ETHBalance ? '0.00' : '-'}</DBTd>
+                    <DBTd className="r">{ETHBalance?.toSignificant(6) ? formatDecimal(ETHBalance?.toSignificant(6), 2) : '-'}</DBTd>
+                    <DBTd className="c"></DBTd>
+                  </tr>
+                  <tr>
+                    <DBTd>
+                      <TokenTableCoinBox>
+
+                        <TokenNameBox>
+                          <h3>100.00</h3>
+                        </TokenNameBox>
+                      </TokenTableCoinBox>
+                    </DBTd>
+                    <DBTd className="r">{ETHBalance?.toSignificant(6) ? formatDecimal(ETHBalance?.toSignificant(6), 2) : '-'}</DBTd>
+                    <DBTd className="r">{ETHBalance ? '0.00' : '-'}</DBTd>
+                    <DBTd className="r">{ETHBalance?.toSignificant(6) ? formatDecimal(ETHBalance?.toSignificant(6), 2) : '-'}</DBTd>
+                    <DBTd className="c"></DBTd>
+                  </tr>
+                </DBTbody>
+              </DBTables>
+              {showMore && totalCount > pagesize && !searchContent ? changePage(setPagecount, pagecount) : ''}
+            </MyBalanceTokenBox>
+            <MoreBtnBox
+              onClick={() => {
+                setShowMore(!showMore)
+              }}
+            >
+              {showMore ? (
+                <>
+                  <ColoredDropup></ColoredDropup>
+                  {t('pichUp')}
+                </>
+              ) : (
+                <>
+                  <ColoredDropdown></ColoredDropdown>
+                  {t('showMore')}
+                </>
+              )}
+            </MoreBtnBox>
+          </BuybackLedger>
         </Container>
 
 

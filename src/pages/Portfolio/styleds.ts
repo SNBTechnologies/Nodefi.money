@@ -1,6 +1,47 @@
 import styled from 'styled-components'
 import { NavLink } from 'react-router-dom'
 
+export const Container = styled.div`
+  display: flex; 
+  justify-content: center;
+  flex-wrap: wrap;
+
+}
+`
+
+export const Row = styled.div`
+  display: inline-flex;
+  @media (min-width: 320px) and (max-width: 480px) {
+    display: block;
+  }
+  @media (min-width: 768px) and (max-width: 1024px) {
+    display: block;
+  }
+}
+`
+
+export const Col = styled.div`
+  width: 500px;
+  padding: 20px;
+  @media (min-width: 320px) and (max-width: 480px) {
+    width: 375px;
+  }
+  @media (min-width: 481px) and (max-width: 767px) {
+    width: 275px;
+  }
+  @media (min-width: 768px) and (max-width: 1024px) {
+    width: 800px;
+  }
+  @media only screen 
+  and (min-width: 1024px) 
+  and (max-height: 1366px) 
+  and (orientation: portrait) 
+  and (-webkit-min-device-pixel-ratio: 1.5) {
+   width: 620px;
+  }
+}
+`
+
 export const MyBalanceBox = styled.div`
   width: 100%;
 
